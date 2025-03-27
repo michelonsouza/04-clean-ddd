@@ -28,10 +28,10 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],
       watermarks: {
-        statements: [80, 95],
-        functions: [80, 95],
-        branches: [80, 95],
-        lines: [80, 95],
+        statements: [80, 90],
+        functions: [80, 90],
+        branches: [80, 90],
+        lines: [80, 90],
       },
       exclude: [
         ...coverageConfigDefaults.exclude,
