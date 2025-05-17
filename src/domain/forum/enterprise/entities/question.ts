@@ -24,6 +24,7 @@ export class Question extends Entity<QuestionConstructorParams> {
     }: Optional<QuestionConstructorParams, 'createdAt' | 'slug'>,
     id?: UniqueEntityID,
   ) {
+    console.log({ createdAt });
     const question = new Question(
       {
         ...params,
