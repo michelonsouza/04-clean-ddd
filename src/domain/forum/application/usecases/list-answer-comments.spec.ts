@@ -1,0 +1,121 @@
+import { fakerPT_BR as faker } from '@faker-js/faker';
+import { subDays } from 'date-fns';
+
+import { makeAnswer } from '__tests__/factories/make-answer';
+import { makeAnswerComment } from '__tests__/factories/make-answer-comment';
+import { InMemoryAnswerCommentsRepository } from '__tests__/repositories/in-memory-answer-comments-repository';
+import { InMemoryAnswersRepository } from '__tests__/repositories/in-memory-answers-repository';
+
+import { ListAnswerCommentsUseCase } from './list-answer-comments';
+import type { Answer } from '../../enterprise/entities/answer';
+
+let inMemoryAnswersRepository: InMemoryAnswersRepository;
+let inMemoryAnswerCommentsRepository: InMemoryAnswerCommentsRepository;
+let sut: ListAnswerCommentsUseCase;
+let answer: Answer;
+let anotherAnswer: Answer;
+
+describe('ListAnswerCommentsUseCase', () => {
+  beforeEach(async () => {
+    inMemoryAnswersRepository = new InMemoryAnswersRepository();
+    inMemoryAnswerCommentsRepository = new InMemoryAnswerCommentsRepository();
+    sut = new ListAnswerCommentsUseCase(inMemoryAnswerCommentsRepository);
+
+    const { answer: a } = makeAnswer();
+    const { answer: anotherA } = makeAnswer();
+    answer = a;
+    anotherAnswer = anotherA;
+
+    await Promise.all([
+      inMemoryAnswersRepository.create(answer),
+      inMemoryAnswersRepository.create(anotherAnswer),
+    ]);
+  });
+
+  it('should be able to list answer comments by question ID', async () => {
+    const answerId = answer.id;
+    const anotherAnswerId = anotherAnswer.id;
+    const answerIds = [answerId.toString(), anotherAnswerId.toString()];
+    const answerIndex = faker.number.int({
+      min: 0,
+      max: 1,
+    });
+    const answersQuantity = faker.number.int({ min: 2, max: 20 });
+    const anotherAnswerCommentsQuantity = faker.number.int({
+      min: 2,
+      max: 20,
+    });
+    const answerComments = Array.from({ length: answersQuantity }, () => {
+      const { answerComment } = makeAnswerComment({
+        answerId,
+        createdAt: subDays(new Date(), faker.number.int({ min: 1, max: 30 })),
+      });
+
+      return answerComment;
+    });
+    const anotherAnswerComments = Array.from(
+      { length: anotherAnswerCommentsQuantity },
+      () => {
+        const { answerComment } = makeAnswerComment({
+          answerId: anotherAnswerId,
+          createdAt: subDays(new Date(), faker.number.int({ min: 1, max: 30 })),
+        });
+
+        return answerComment;
+      },
+    );
+    const allComments = [...answerComments, ...anotherAnswerComments];
+    const answersToCompare =
+      answerIndex === 0 ? answerComments : anotherAnswerComments;
+
+    await Promise.all(
+      allComments.map(comment => {
+        return inMemoryAnswerCommentsRepository.create(comment);
+      }),
+    );
+
+    const { data } = await sut.execute({
+      answerId: answerIds[answerIndex],
+      page: 1,
+    });
+
+    expect(data).toHaveLength(answersToCompare.length);
+    expect(data).toEqual(expect.arrayContaining(answersToCompare));
+  });
+
+  it('should be able to list paginated answer comments by question ID', async () => {
+    const answerId = answer.id;
+    const answersQuantity = faker.number.int({ min: 20, max: 60 });
+    const mockedAnswers = Array.from({ length: answersQuantity }, () => {
+      const { answerComment } = makeAnswerComment({
+        answerId,
+        createdAt: subDays(new Date(), faker.number.int({ min: 1, max: 30 })),
+      });
+
+      return answerComment;
+    });
+    let page = answersQuantity % 3 === 0 ? 3 : 1;
+
+    if (answersQuantity % 2 === 0) {
+      page = 2;
+    }
+
+    const mockedAnswersPerPage = [...mockedAnswers].slice(
+      (page - 1) * 20,
+      page * 20,
+    );
+
+    await Promise.all(
+      mockedAnswers.map(answer => {
+        return inMemoryAnswerCommentsRepository.create(answer);
+      }),
+    );
+
+    const { data: answers } = await sut.execute({
+      answerId: answer.id.toString(),
+      page,
+    });
+
+    expect(answers.length).toEqual(mockedAnswersPerPage.length);
+  });
+});
