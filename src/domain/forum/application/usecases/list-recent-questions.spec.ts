@@ -9,7 +9,7 @@ import { ListRecentQuestionsUseCase } from './list-recent-questions';
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
 let sut: ListRecentQuestionsUseCase;
 
-describe.only('ListRecentQuestionsUseCase', () => {
+describe('ListRecentQuestionsUseCase', () => {
   beforeEach(() => {
     inMemoryQuestionsRepository = new InMemoryQuestionsRepository();
     sut = new ListRecentQuestionsUseCase(inMemoryQuestionsRepository);

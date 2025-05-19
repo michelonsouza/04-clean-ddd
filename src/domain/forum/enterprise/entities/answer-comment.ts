@@ -2,7 +2,8 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 
 import { Comment, type CommentConstructorParams } from './comment';
 
-interface AnswerCommentConstructorParams extends CommentConstructorParams {
+export interface AnswerCommentConstructorParams
+  extends CommentConstructorParams {
   answerId: UniqueEntityID;
 }
 

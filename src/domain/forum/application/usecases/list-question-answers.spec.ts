@@ -15,7 +15,7 @@ let sut: ListQuestionAnswersUseCase;
 let question: Question;
 let anotherQuestion: Question;
 
-describe.only('ListQuestionAnswersUseCase', () => {
+describe('ListQuestionAnswersUseCase', () => {
   beforeEach(async () => {
     inMemoryQuestionsRepository = new InMemoryQuestionsRepository();
     inMemoryAnswersRepository = new InMemoryAnswersRepository();
