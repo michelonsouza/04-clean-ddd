@@ -36,4 +36,15 @@ describe('CommentOnQuestionUseCaseUseCase', () => {
     expect(questionCommentCreated.authorId?.toString()).toEqual(authorId);
     expect(questionCommentCreated.questionId?.toString()).toEqual(questionId);
   });
+
+  it('should not be able to create question comment on unexistent question', async () => {
+    const { question } = makeQuestion();
+    const { authorId, content, questionId } = makeQuestionComment({
+      questionId: question.id,
+    });
+
+    await expect(
+      sut.execute({ authorId, questionId, content }),
+    ).rejects.toBeInstanceOf(Error);
+  });
 });
