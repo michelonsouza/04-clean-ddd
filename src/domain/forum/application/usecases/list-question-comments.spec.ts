@@ -75,11 +75,14 @@ describe('ListQuestionCommentsUseCase', () => {
       }),
     );
 
-    const { data } = await sut.execute({
+    const result = await sut.execute({
       questionId: questionIds[questionIndex],
       page: 1,
     });
 
+    const { data } = result.value!;
+
+    expect(result.isRight()).toBe(true);
     expect(data).toHaveLength(answersToCompare.length);
     expect(data).toEqual(expect.arrayContaining(answersToCompare));
   });
@@ -112,11 +115,14 @@ describe('ListQuestionCommentsUseCase', () => {
       }),
     );
 
-    const { data: answers } = await sut.execute({
+    const result = await sut.execute({
       questionId: question.id.toString(),
       page,
     });
 
+    const { data: answers } = result.value!;
+
+    expect(result.isRight()).toBe(true);
     expect(answers.length).toEqual(mockedAnswersPerPage.length);
   });
 });

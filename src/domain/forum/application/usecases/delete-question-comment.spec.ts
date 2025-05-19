@@ -6,6 +6,8 @@ import { InMemoryQuestionCommentsRepository } from '__tests__/repositories/in-me
 import { InMemoryQuestionsRepository } from '__tests__/repositories/in-memory-questions-repository';
 
 import { DeleteQuestionCommentUseCase } from './delete-question-comment';
+import { NotAllowedError } from './errors/not-allowed-error';
+import { ResourceNotFoundError } from './errors/resource-not-found';
 
 let inMemoryQuestionCommentsRepository: InMemoryQuestionCommentsRepository;
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
@@ -48,20 +50,24 @@ describe('DeleteQuestionCommentUseCaseUseCase', () => {
     await inMemoryQuestionsRepository.create(question);
     await inMemoryQuestionCommentsRepository.create(questionComment);
 
-    await expect(
-      sut.execute({ authorId: wrongAuthorId, questionCommentId }),
-    ).rejects.toBeInstanceOf(Error);
+    const result = await sut.execute({
+      authorId: wrongAuthorId,
+      questionCommentId,
+    });
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(NotAllowedError);
   });
 
   it('should not be able to delete not found question comment', async () => {
     const wrongAuthorId = faker.string.uuid();
     const wrongQuestionCommentId = faker.string.uuid();
 
-    await expect(
-      sut.execute({
-        authorId: wrongAuthorId,
-        questionCommentId: wrongQuestionCommentId,
-      }),
-    ).rejects.toBeInstanceOf(Error);
+    const result = await sut.execute({
+      authorId: wrongAuthorId,
+      questionCommentId: wrongQuestionCommentId,
+    });
+
+    expect(result.isLeft()).toBe(true);
+    expect(result?.value).toBeInstanceOf(ResourceNotFoundError);
   });
 });

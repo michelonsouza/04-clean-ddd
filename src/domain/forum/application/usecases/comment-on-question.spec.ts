@@ -4,6 +4,7 @@ import { InMemoryQuestionCommentsRepository } from '__tests__/repositories/in-me
 import { InMemoryQuestionsRepository } from '__tests__/repositories/in-memory-questions-repository';
 
 import { CommentOnQuestionUseCase } from './comment-on-question';
+import { ResourceNotFoundError } from './errors/resource-not-found';
 
 let inMemoryQuestionCommentsRepository: InMemoryQuestionCommentsRepository;
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
@@ -43,8 +44,9 @@ describe('CommentOnQuestionUseCaseUseCase', () => {
       questionId: question.id,
     });
 
-    await expect(
-      sut.execute({ authorId, questionId, content }),
-    ).rejects.toBeInstanceOf(Error);
+    const result = await sut.execute({ authorId, questionId, content });
+
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError);
   });
 });

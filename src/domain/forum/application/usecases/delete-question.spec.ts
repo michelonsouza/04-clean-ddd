@@ -4,6 +4,8 @@ import { makeQuestion } from '__tests__/factories/make-question';
 import { InMemoryQuestionsRepository } from '__tests__/repositories/in-memory-questions-repository';
 
 import { DeleteQuestionUseCase } from './delete-question';
+import { NotAllowedError } from './errors/not-allowed-error';
+import { ResourceNotFoundError } from './errors/resource-not-found';
 
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
 let sut: DeleteQuestionUseCase;
@@ -32,24 +34,25 @@ describe('DeleteQuestionUseCase', () => {
 
     await inMemoryQuestionsRepository.create(question);
 
-    await expect(
-      sut.execute({
-        questionId: question.id.toValue(),
-        authorId: wrongAuthorId,
-      }),
-    ).rejects.toBeInstanceOf(Error);
+    const result = await sut.execute({
+      questionId: question.id.toValue(),
+      authorId: wrongAuthorId,
+    });
 
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(NotAllowedError);
     expect(inMemoryQuestionsRepository.items).toEqual(
       expect.arrayContaining([question]),
     );
   });
 
   it('should not be able to delete a not found question', async () => {
-    await expect(
-      sut.execute({
-        questionId: faker.string.uuid(),
-        authorId: faker.string.uuid(),
-      }),
-    ).rejects.toBeInstanceOf(Error);
+    const result = await sut.execute({
+      questionId: faker.string.uuid(),
+      authorId: faker.string.uuid(),
+    });
+
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError);
   });
 });

@@ -4,6 +4,8 @@ import { makeAnswer } from '__tests__/factories/make-answer';
 import { InMemoryAnswersRepository } from '__tests__/repositories/in-memory-answers-repository';
 
 import { EditAnswerUseCase } from './edit-answer';
+import { NotAllowedError } from './errors/not-allowed-error';
+import { ResourceNotFoundError } from './errors/resource-not-found';
 
 let inMemoryAnswersRepository: InMemoryAnswersRepository;
 let sut: EditAnswerUseCase;
@@ -41,22 +43,24 @@ describe('EditAnswerUseCase', () => {
 
     await inMemoryAnswersRepository.create(answer);
 
-    await expect(
-      sut.execute({
-        answerId: answer.id.toValue(),
-        authorId: wrongAuthorId,
-        content: editAnswer.content,
-      }),
-    ).rejects.toBeInstanceOf(Error);
+    const result = await sut.execute({
+      answerId: answer.id.toValue(),
+      authorId: wrongAuthorId,
+      content: editAnswer.content,
+    });
+
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(NotAllowedError);
   });
 
   it('should not be able to edit a not found answer', async () => {
-    await expect(
-      sut.execute({
-        answerId: faker.string.uuid(),
-        authorId: faker.string.uuid(),
-        content: faker.lorem.paragraph(),
-      }),
-    ).rejects.toBeInstanceOf(Error);
+    const result = await sut.execute({
+      answerId: faker.string.uuid(),
+      authorId: faker.string.uuid(),
+      content: faker.lorem.paragraph(),
+    });
+
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError);
   });
 });

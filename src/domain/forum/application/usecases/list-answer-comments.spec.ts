@@ -74,13 +74,16 @@ describe('ListAnswerCommentsUseCase', () => {
       }),
     );
 
-    const { data } = await sut.execute({
+    const result = await sut.execute({
       answerId: answerIds[answerIndex],
       page: 1,
     });
 
-    expect(data).toHaveLength(answersToCompare.length);
-    expect(data).toEqual(expect.arrayContaining(answersToCompare));
+    const { data: comments } = result.value!;
+
+    expect(result.isRight()).toBe(true);
+    expect(comments).toHaveLength(answersToCompare.length);
+    expect(comments).toEqual(expect.arrayContaining(answersToCompare));
   });
 
   it('should be able to list paginated answer comments by question ID', async () => {
@@ -111,11 +114,14 @@ describe('ListAnswerCommentsUseCase', () => {
       }),
     );
 
-    const { data: answers } = await sut.execute({
+    const result = await sut.execute({
       answerId: answer.id.toString(),
       page,
     });
 
-    expect(answers.length).toEqual(mockedAnswersPerPage.length);
+    const answers = result?.value?.data;
+
+    expect(result?.isRight()).toBe(true);
+    expect(answers?.length).toEqual(mockedAnswersPerPage.length);
   });
 });

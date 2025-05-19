@@ -4,6 +4,7 @@ import { InMemoryAnswerCommentsRepository } from '__tests__/repositories/in-memo
 import { InMemoryAnswersRepository } from '__tests__/repositories/in-memory-answers-repository';
 
 import { CommentOnAnswerUseCase } from './comment-on-answer';
+import { ResourceNotFoundError } from './errors/resource-not-found';
 
 let inMemoryAnswerCommentsRepository: InMemoryAnswerCommentsRepository;
 let inMemoryAnswersRepository: InMemoryAnswersRepository;
@@ -42,8 +43,9 @@ describe('CommentOnAnswerUseCaseUseCase', () => {
       answerId: answer.id,
     });
 
-    await expect(
-      sut.execute({ authorId, answerId, content }),
-    ).rejects.toBeInstanceOf(Error);
+    const result = await sut.execute({ authorId, answerId, content });
+
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError);
   });
 });

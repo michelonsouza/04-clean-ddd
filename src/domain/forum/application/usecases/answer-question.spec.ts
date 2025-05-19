@@ -18,13 +18,15 @@ describe('AnswerQuestionUseCase', () => {
     const questionId = faker.string.uuid();
     const content = faker.lorem.sentence();
 
-    const { data: answer } = await sut.execute({
+    const result = await sut.execute({
       instructorId,
       questionId,
       content,
     });
 
-    expect(answer.content).toEqual(content);
-    expect(inMemoryQuestionsRepository.items[0].id).toEqual(answer.id);
+    const answer = result.value?.data;
+
+    expect(answer?.content).toEqual(content);
+    expect(inMemoryQuestionsRepository.items[0].id).toEqual(answer?.id);
   });
 });

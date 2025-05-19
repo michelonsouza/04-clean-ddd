@@ -35,8 +35,10 @@ describe('ListRecentQuestionsUseCase', () => {
       ),
     );
 
-    const { data: questions } = await sut.execute({ page: 1 });
+    const result = await sut.execute({ page: 1 });
+    const { data: questions } = result.value!;
 
+    expect(result.isRight()).toBe(true);
     expect(questions).toEqual(expect.arrayContaining(mockedQuestions));
     expect(questions[0].createdAt).toEqual(createdAt);
   });
@@ -71,8 +73,10 @@ describe('ListRecentQuestionsUseCase', () => {
       ),
     );
 
-    const { data: questions } = await sut.execute({ page });
+    const result = await sut.execute({ page });
+    const { data: questions } = result.value!;
 
+    expect(result.isRight()).toBe(true);
     expect(questions).toEqual(expect.arrayContaining(mockedQuestionsPerPage));
   });
 });

@@ -1,5 +1,9 @@
+import { type Either, left, right } from '@/core/either';
+
 import type { Answer } from '../../enterprise/entities/answer';
 import type { AnswersRepository } from '../repositories/answers-repository';
+import { NotAllowedError } from './errors/not-allowed-error';
+import { ResourceNotFoundError } from './errors/resource-not-found';
 
 interface EditAnswerUseCaseParams {
   answerId: string;
@@ -7,9 +11,12 @@ interface EditAnswerUseCaseParams {
   content: string;
 }
 
-interface EditAnswerUseCaseResponse {
-  data: Answer;
-}
+type EditAnswerUseCaseResponse = Either<
+  ResourceNotFoundError | NotAllowedError,
+  {
+    data: Answer;
+  }
+>;
 
 export class EditAnswerUseCase {
   #answersRepository: AnswersRepository;
@@ -26,21 +33,21 @@ export class EditAnswerUseCase {
     const answer = await this.#answersRepository.findById(answerId);
 
     if (!answer) {
-      throw new Error('Answer not found');
+      return left(new ResourceNotFoundError('Answer'));
     }
 
     const isAnswerAuthor = answer.authorId.toValue() === authorId;
 
     if (!isAnswerAuthor) {
-      throw new Error('Not Allowed');
+      return left(new NotAllowedError());
     }
 
     answer.content = content;
 
     await this.#answersRepository.save(answer);
 
-    return {
+    return right({
       data: answer,
-    };
+    });
   }
 }

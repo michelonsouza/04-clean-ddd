@@ -7,6 +7,8 @@ import { InMemoryAnswersRepository } from '__tests__/repositories/in-memory-answ
 import { InMemoryQuestionsRepository } from '__tests__/repositories/in-memory-questions-repository';
 
 import { ChoseQuestionBestAnswerUseCase } from './chose-question-best-answer';
+import { NotAllowedError } from './errors/not-allowed-error';
+import { ResourceNotFoundError } from './errors/resource-not-found';
 
 let inMemoryAnswersRepository: InMemoryAnswersRepository;
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
@@ -52,12 +54,13 @@ describe('ChoseQuestionBestAnswerUseCase', () => {
     await inMemoryQuestionsRepository.create(question);
     await inMemoryAnswersRepository.create(answer);
 
-    await expect(
-      sut.execute({
-        answerId: answer.id.toValue(),
-        authorId: faker.string.uuid(),
-      }),
-    ).rejects.toBeInstanceOf(Error);
+    const result = await sut.execute({
+      answerId: answer.id.toValue(),
+      authorId: faker.string.uuid(),
+    });
+
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(NotAllowedError);
   });
 
   it('should not be able to chose not found question', async () => {
@@ -67,20 +70,22 @@ describe('ChoseQuestionBestAnswerUseCase', () => {
     });
 
     await inMemoryAnswersRepository.create(answer);
-    await expect(
-      sut.execute({
-        answerId: answer.id.toValue(),
-        authorId: answer.authorId.toValue(),
-      }),
-    ).rejects.toBeInstanceOf(Error);
+
+    const result = await sut.execute({
+      answerId: answer.id.toValue(),
+      authorId: answer.authorId.toValue(),
+    });
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError);
   });
 
   it('should not be able to chose not found answer', async () => {
-    await expect(
-      sut.execute({
-        answerId: faker.string.uuid(),
-        authorId: faker.string.uuid(),
-      }),
-    ).rejects.toBeInstanceOf(Error);
+    const result = await sut.execute({
+      answerId: faker.string.uuid(),
+      authorId: faker.string.uuid(),
+    });
+
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError);
   });
 });

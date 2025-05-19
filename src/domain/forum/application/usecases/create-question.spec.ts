@@ -18,13 +18,16 @@ describe('CreateQuestionUseCase', () => {
     const title = faker.lorem.sentence();
     const content = faker.lorem.sentence();
 
-    const { data: question } = await sut.execute({
+    const result = await sut.execute({
       authorId,
       content,
       title,
     });
 
-    expect(question.content).toEqual(content);
-    expect(inMemoryQuestionsRepository.items[0].id).toEqual(question.id);
+    const question = result.value?.data;
+
+    expect(result.isRight()).toBe(true);
+    expect(question?.content).toEqual(content);
+    expect(inMemoryQuestionsRepository.items[0].id).toEqual(question?.id);
   });
 });
