@@ -1,9 +1,10 @@
 import { differenceInDays } from 'date-fns';
 
-import { Entity } from '@/core/entities/entity';
+import { AggregateRoot } from '@/core/entities/aggregate-root';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { Optional } from '@/core/types/optional';
 
+import { QuestionAttachment } from './question-attachment';
 import { Slug } from './value-objects/slug';
 
 export interface QuestionConstructorParams {
@@ -12,21 +13,26 @@ export interface QuestionConstructorParams {
   slug: Slug;
   title: string;
   content: string;
+  attachments: QuestionAttachment[];
   createdAt: Date;
   updatedAt?: Date;
 }
 
-export class Question extends Entity<QuestionConstructorParams> {
+export class Question extends AggregateRoot<QuestionConstructorParams> {
   static create(
     {
       createdAt,
       ...params
-    }: Optional<QuestionConstructorParams, 'createdAt' | 'slug'>,
+    }: Optional<
+      QuestionConstructorParams,
+      'createdAt' | 'slug' | 'attachments'
+    >,
     id?: UniqueEntityID,
   ) {
     const question = new Question(
       {
         ...params,
+        attachments: params?.attachments ?? [],
         slug: params?.slug ?? Slug.createFromText(params.title),
         createdAt: createdAt ?? new Date(),
       },
@@ -81,6 +87,15 @@ export class Question extends Entity<QuestionConstructorParams> {
 
   set content(content: string) {
     this.params.content = content;
+    this.#touch();
+  }
+
+  get attachments(): QuestionAttachment[] {
+    return this.params.attachments;
+  }
+
+  set attachments(attachments: QuestionAttachment[]) {
+    this.params.attachments = attachments;
     this.#touch();
   }
 

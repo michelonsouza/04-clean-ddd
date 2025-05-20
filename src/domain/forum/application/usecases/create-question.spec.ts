@@ -1,5 +1,6 @@
 import { fakerPT_BR as faker } from '@faker-js/faker';
 
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { InMemoryQuestionsRepository } from '__tests__/repositories/in-memory-questions-repository';
 
 import { CreateQuestionUseCase } from './create-question';
@@ -17,17 +18,33 @@ describe('CreateQuestionUseCase', () => {
     const authorId = faker.string.uuid();
     const title = faker.lorem.sentence();
     const content = faker.lorem.sentence();
+    const attachmentIds = Array.from(
+      { length: faker.number.int({ min: 1, max: 5 }) },
+      () => faker.string.uuid(),
+    );
 
     const result = await sut.execute({
       authorId,
       content,
       title,
+      attachmentIds,
     });
 
     const question = result.value?.data;
+    const objExpectContainsArr = attachmentIds.map(attachementId =>
+      expect.objectContaining({
+        attachmentId: new UniqueEntityID(attachementId),
+      }),
+    );
 
     expect(result.isRight()).toBe(true);
     expect(question?.content).toEqual(content);
     expect(inMemoryQuestionsRepository.items[0].id).toEqual(question?.id);
+    expect(inMemoryQuestionsRepository.items[0].attachments).toHaveLength(
+      attachmentIds.length,
+    );
+    expect(inMemoryQuestionsRepository.items[0].attachments).toEqual(
+      objExpectContainsArr,
+    );
   });
 });
