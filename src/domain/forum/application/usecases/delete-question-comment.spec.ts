@@ -2,6 +2,7 @@ import { fakerPT_BR as faker } from '@faker-js/faker';
 
 import { makeQuestion } from '__tests__/factories/make-question';
 import { makeQuestionComment } from '__tests__/factories/make-question-comment';
+import { InMemoryQuestionAttachementsRepository } from '__tests__/repositories/in-memory-question-attachments-repository';
 import { InMemoryQuestionCommentsRepository } from '__tests__/repositories/in-memory-question-comments-repository';
 import { InMemoryQuestionsRepository } from '__tests__/repositories/in-memory-questions-repository';
 
@@ -11,13 +12,18 @@ import { ResourceNotFoundError } from './errors/resource-not-found';
 
 let inMemoryQuestionCommentsRepository: InMemoryQuestionCommentsRepository;
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
+let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachementsRepository;
 let sut: DeleteQuestionCommentUseCase;
 
 describe('DeleteQuestionCommentUseCaseUseCase', () => {
   beforeEach(() => {
+    inMemoryQuestionAttachmentsRepository =
+      new InMemoryQuestionAttachementsRepository();
     inMemoryQuestionCommentsRepository =
       new InMemoryQuestionCommentsRepository();
-    inMemoryQuestionsRepository = new InMemoryQuestionsRepository();
+    inMemoryQuestionsRepository = new InMemoryQuestionsRepository(
+      inMemoryQuestionAttachmentsRepository,
+    );
     sut = new DeleteQuestionCommentUseCase(inMemoryQuestionCommentsRepository);
   });
 

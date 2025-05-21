@@ -1,6 +1,8 @@
 import { fakerPT_BR as faker } from '@faker-js/faker';
 
 import { makeQuestion } from '__tests__/factories/make-question';
+import { makeQuestionAttachment } from '__tests__/factories/make-question-attachment';
+import { InMemoryQuestionAttachementsRepository } from '__tests__/repositories/in-memory-question-attachments-repository';
 import { InMemoryQuestionsRepository } from '__tests__/repositories/in-memory-questions-repository';
 
 import { DeleteQuestionUseCase } from './delete-question';
@@ -8,16 +10,38 @@ import { NotAllowedError } from './errors/not-allowed-error';
 import { ResourceNotFoundError } from './errors/resource-not-found';
 
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
+let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachementsRepository;
 let sut: DeleteQuestionUseCase;
 
 describe('DeleteQuestionUseCase', () => {
   beforeEach(() => {
-    inMemoryQuestionsRepository = new InMemoryQuestionsRepository();
+    inMemoryQuestionAttachmentsRepository =
+      new InMemoryQuestionAttachementsRepository();
+    inMemoryQuestionsRepository = new InMemoryQuestionsRepository(
+      inMemoryQuestionAttachmentsRepository,
+    );
     sut = new DeleteQuestionUseCase(inMemoryQuestionsRepository);
   });
 
   it('should be able to delete a question by id', async () => {
     const { question, authorId } = makeQuestion();
+    const questionAttachmentQuantity = faker.number.int({ min: 1, max: 5 });
+    const questionAttachments = Array.from(
+      { length: questionAttachmentQuantity },
+      () => {
+        const { questionAttachment } = makeQuestionAttachment({
+          questionId: question.id,
+          attachmentId: question.id,
+        });
+        return questionAttachment;
+      },
+    );
+
+    await Promise.all(
+      questionAttachments.map(questionAttachment =>
+        inMemoryQuestionAttachmentsRepository.create(questionAttachment),
+      ),
+    );
 
     await inMemoryQuestionsRepository.create(question);
 
@@ -26,6 +50,7 @@ describe('DeleteQuestionUseCase', () => {
     expect(inMemoryQuestionsRepository.items).not.toEqual(
       expect.arrayContaining([question]),
     );
+    expect(inMemoryQuestionAttachmentsRepository.items).toHaveLength(0);
   });
 
   it('should not be able to delete a question from another user', async () => {

@@ -5,6 +5,7 @@ import {
   Question,
   QuestionConstructorParams,
 } from '@/domain/forum/enterprise/entities/question';
+import { QuestionAttachmentList } from '@/domain/forum/enterprise/entities/question-attachment-list';
 import { Slug } from '@/domain/forum/enterprise/entities/value-objects/slug';
 
 export function makeQuestion(
@@ -17,12 +18,14 @@ export function makeQuestion(
   const slug =
     override?.slug?.value ??
     faker.helpers.slugify(title).toLowerCase().replace('.', '');
+  const attachments = override.attachments ?? new QuestionAttachmentList();
 
   const question = Question.create(
     {
       authorId: new UniqueEntityID(authorId),
       content,
       title,
+      attachments,
       slug: Slug.create(slug),
       ...override,
     },
@@ -35,5 +38,6 @@ export function makeQuestion(
     question,
     slug,
     title,
+    attachments,
   };
 }

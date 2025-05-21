@@ -4,7 +4,7 @@ import { AggregateRoot } from '@/core/entities/aggregate-root';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { Optional } from '@/core/types/optional';
 
-import { QuestionAttachment } from './question-attachment';
+import { QuestionAttachmentList } from './question-attachment-list';
 import { Slug } from './value-objects/slug';
 
 export interface QuestionConstructorParams {
@@ -13,7 +13,7 @@ export interface QuestionConstructorParams {
   slug: Slug;
   title: string;
   content: string;
-  attachments: QuestionAttachment[];
+  attachments: QuestionAttachmentList;
   createdAt: Date;
   updatedAt?: Date;
 }
@@ -22,6 +22,7 @@ export class Question extends AggregateRoot<QuestionConstructorParams> {
   static create(
     {
       createdAt,
+      attachments,
       ...params
     }: Optional<
       QuestionConstructorParams,
@@ -32,7 +33,7 @@ export class Question extends AggregateRoot<QuestionConstructorParams> {
     const question = new Question(
       {
         ...params,
-        attachments: params?.attachments ?? [],
+        attachments: attachments ?? new QuestionAttachmentList(),
         slug: params?.slug ?? Slug.createFromText(params.title),
         createdAt: createdAt ?? new Date(),
       },
@@ -90,11 +91,11 @@ export class Question extends AggregateRoot<QuestionConstructorParams> {
     this.#touch();
   }
 
-  get attachments(): QuestionAttachment[] {
+  get attachments(): QuestionAttachmentList {
     return this.params.attachments;
   }
 
-  set attachments(attachments: QuestionAttachment[]) {
+  set attachments(attachments: QuestionAttachmentList) {
     this.params.attachments = attachments;
     this.#touch();
   }

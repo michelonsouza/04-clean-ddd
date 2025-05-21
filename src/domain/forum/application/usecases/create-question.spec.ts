@@ -1,16 +1,22 @@
 import { fakerPT_BR as faker } from '@faker-js/faker';
 
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { InMemoryQuestionAttachementsRepository } from '__tests__/repositories/in-memory-question-attachments-repository';
 import { InMemoryQuestionsRepository } from '__tests__/repositories/in-memory-questions-repository';
 
 import { CreateQuestionUseCase } from './create-question';
 
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
+let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachementsRepository;
 let sut: CreateQuestionUseCase;
 
 describe('CreateQuestionUseCase', () => {
   beforeEach(() => {
-    inMemoryQuestionsRepository = new InMemoryQuestionsRepository();
+    inMemoryQuestionAttachmentsRepository =
+      new InMemoryQuestionAttachementsRepository();
+    inMemoryQuestionsRepository = new InMemoryQuestionsRepository(
+      inMemoryQuestionAttachmentsRepository,
+    );
     sut = new CreateQuestionUseCase(inMemoryQuestionsRepository);
   });
 
@@ -40,10 +46,10 @@ describe('CreateQuestionUseCase', () => {
     expect(result.isRight()).toBe(true);
     expect(question?.content).toEqual(content);
     expect(inMemoryQuestionsRepository.items[0].id).toEqual(question?.id);
-    expect(inMemoryQuestionsRepository.items[0].attachments).toHaveLength(
-      attachmentIds.length,
-    );
-    expect(inMemoryQuestionsRepository.items[0].attachments).toEqual(
+    expect(
+      inMemoryQuestionsRepository.items[0].attachments.getItems(),
+    ).toHaveLength(attachmentIds.length);
+    expect(inMemoryQuestionsRepository.items[0].attachments.getItems()).toEqual(
       objExpectContainsArr,
     );
   });

@@ -2,6 +2,7 @@ import { fakerPT_BR as faker } from '@faker-js/faker';
 
 import { makeAnswer } from '__tests__/factories/make-answer';
 import { makeAnswerComment } from '__tests__/factories/make-answer-comment';
+import { InMemoryAnswerAttachementsRepository } from '__tests__/repositories/in-memory-answer-attachments-repository';
 import { InMemoryAnswerCommentsRepository } from '__tests__/repositories/in-memory-answer-comments-repository';
 import { InMemoryAnswersRepository } from '__tests__/repositories/in-memory-answers-repository';
 
@@ -11,12 +12,17 @@ import { ResourceNotFoundError } from './errors/resource-not-found';
 
 let inMemoryAnswerCommentsRepository: InMemoryAnswerCommentsRepository;
 let inMemoryAnswersRepository: InMemoryAnswersRepository;
+let inMemoryAnswerAttachementsRepository: InMemoryAnswerAttachementsRepository;
 let sut: DeleteAnswerCommentUseCase;
 
 describe('DeleteAnswerCommentUseCaseUseCase', () => {
   beforeEach(() => {
+    inMemoryAnswerAttachementsRepository =
+      new InMemoryAnswerAttachementsRepository();
     inMemoryAnswerCommentsRepository = new InMemoryAnswerCommentsRepository();
-    inMemoryAnswersRepository = new InMemoryAnswersRepository();
+    inMemoryAnswersRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachementsRepository,
+    );
     sut = new DeleteAnswerCommentUseCase(inMemoryAnswerCommentsRepository);
   });
 

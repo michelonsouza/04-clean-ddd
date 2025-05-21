@@ -2,16 +2,22 @@ import { fakerPT_BR as faker } from '@faker-js/faker';
 import { subDays } from 'date-fns';
 
 import { makeQuestion } from '__tests__/factories/make-question';
+import { InMemoryQuestionAttachementsRepository } from '__tests__/repositories/in-memory-question-attachments-repository';
 import { InMemoryQuestionsRepository } from '__tests__/repositories/in-memory-questions-repository';
 
 import { ListRecentQuestionsUseCase } from './list-recent-questions';
 
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
+let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachementsRepository;
 let sut: ListRecentQuestionsUseCase;
 
 describe('ListRecentQuestionsUseCase', () => {
   beforeEach(() => {
-    inMemoryQuestionsRepository = new InMemoryQuestionsRepository();
+    inMemoryQuestionAttachmentsRepository =
+      new InMemoryQuestionAttachementsRepository();
+    inMemoryQuestionsRepository = new InMemoryQuestionsRepository(
+      inMemoryQuestionAttachmentsRepository,
+    );
     sut = new ListRecentQuestionsUseCase(inMemoryQuestionsRepository);
   });
 

@@ -1,9 +1,15 @@
 import { PaginationParams } from '@/core/repositories/pagination-params';
+import { AnswerAttachmentsRepository } from '@/domain/forum/application/repositories/answer-attachments-repository';
 import type { AnswersRepository } from '@/domain/forum/application/repositories/answers-repository';
 import type { Answer } from '@/domain/forum/enterprise/entities/answer';
 
 export class InMemoryAnswersRepository implements AnswersRepository {
   #answers: Answer[] = [];
+  #answerAttachmentsRepository: AnswerAttachmentsRepository;
+
+  constructor(answerAttachmentsRepository: AnswerAttachmentsRepository) {
+    this.#answerAttachmentsRepository = answerAttachmentsRepository;
+  }
 
   async save(question: Answer) {
     const index = this.#answers.findIndex(
@@ -44,6 +50,10 @@ export class InMemoryAnswersRepository implements AnswersRepository {
     );
 
     this.#answers = answers;
+
+    await this.#answerAttachmentsRepository.deleteManyByAnswerId(
+      answer.id.toValue(),
+    );
 
     return Promise.resolve();
   }

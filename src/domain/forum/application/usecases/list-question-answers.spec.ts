@@ -3,7 +3,9 @@ import { subDays } from 'date-fns';
 
 import { makeAnswer } from '__tests__/factories/make-answer';
 import { makeQuestion } from '__tests__/factories/make-question';
+import { InMemoryAnswerAttachementsRepository } from '__tests__/repositories/in-memory-answer-attachments-repository';
 import { InMemoryAnswersRepository } from '__tests__/repositories/in-memory-answers-repository';
+import { InMemoryQuestionAttachementsRepository } from '__tests__/repositories/in-memory-question-attachments-repository';
 import { InMemoryQuestionsRepository } from '__tests__/repositories/in-memory-questions-repository';
 
 import { ListQuestionAnswersUseCase } from './list-question-answers';
@@ -11,14 +13,24 @@ import type { Question } from '../../enterprise/entities/question';
 
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
 let inMemoryAnswersRepository: InMemoryAnswersRepository;
+let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachementsRepository;
+let inMemoryAnswerAttachementsRepository: InMemoryAnswerAttachementsRepository;
 let sut: ListQuestionAnswersUseCase;
 let question: Question;
 let anotherQuestion: Question;
 
 describe('ListQuestionAnswersUseCase', () => {
   beforeEach(async () => {
-    inMemoryQuestionsRepository = new InMemoryQuestionsRepository();
-    inMemoryAnswersRepository = new InMemoryAnswersRepository();
+    inMemoryAnswerAttachementsRepository =
+      new InMemoryAnswerAttachementsRepository();
+    inMemoryQuestionAttachmentsRepository =
+      new InMemoryQuestionAttachementsRepository();
+    inMemoryQuestionsRepository = new InMemoryQuestionsRepository(
+      inMemoryQuestionAttachmentsRepository,
+    );
+    inMemoryAnswersRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachementsRepository,
+    );
     sut = new ListQuestionAnswersUseCase(inMemoryAnswersRepository);
 
     const { question: q } = makeQuestion();

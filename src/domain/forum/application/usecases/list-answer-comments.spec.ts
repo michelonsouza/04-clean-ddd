@@ -3,6 +3,7 @@ import { subDays } from 'date-fns';
 
 import { makeAnswer } from '__tests__/factories/make-answer';
 import { makeAnswerComment } from '__tests__/factories/make-answer-comment';
+import { InMemoryAnswerAttachementsRepository } from '__tests__/repositories/in-memory-answer-attachments-repository';
 import { InMemoryAnswerCommentsRepository } from '__tests__/repositories/in-memory-answer-comments-repository';
 import { InMemoryAnswersRepository } from '__tests__/repositories/in-memory-answers-repository';
 
@@ -11,13 +12,18 @@ import type { Answer } from '../../enterprise/entities/answer';
 
 let inMemoryAnswersRepository: InMemoryAnswersRepository;
 let inMemoryAnswerCommentsRepository: InMemoryAnswerCommentsRepository;
+let inMemoryAnswerAttachementsRepository: InMemoryAnswerAttachementsRepository;
 let sut: ListAnswerCommentsUseCase;
 let answer: Answer;
 let anotherAnswer: Answer;
 
 describe('ListAnswerCommentsUseCase', () => {
   beforeEach(async () => {
-    inMemoryAnswersRepository = new InMemoryAnswersRepository();
+    inMemoryAnswerAttachementsRepository =
+      new InMemoryAnswerAttachementsRepository();
+    inMemoryAnswersRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachementsRepository,
+    );
     inMemoryAnswerCommentsRepository = new InMemoryAnswerCommentsRepository();
     sut = new ListAnswerCommentsUseCase(inMemoryAnswerCommentsRepository);
 

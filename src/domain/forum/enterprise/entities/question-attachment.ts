@@ -1,7 +1,7 @@
 import { Entity } from '@/core/entities/entity';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 
-interface QuestionAttachmentConstructorParams {
+export interface QuestionAttachmentConstructorParams {
   questionId: UniqueEntityID;
   attachmentId: UniqueEntityID;
 }

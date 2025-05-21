@@ -3,6 +3,7 @@ import { subDays } from 'date-fns';
 
 import { makeQuestion } from '__tests__/factories/make-question';
 import { makeQuestionComment } from '__tests__/factories/make-question-comment';
+import { InMemoryQuestionAttachementsRepository } from '__tests__/repositories/in-memory-question-attachments-repository';
 import { InMemoryQuestionCommentsRepository } from '__tests__/repositories/in-memory-question-comments-repository';
 import { InMemoryQuestionsRepository } from '__tests__/repositories/in-memory-questions-repository';
 
@@ -11,13 +12,18 @@ import type { Question } from '../../enterprise/entities/question';
 
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
 let inMemoryQuestionCommentsRepository: InMemoryQuestionCommentsRepository;
+let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachementsRepository;
 let sut: ListQuestionCommentsUseCase;
 let question: Question;
 let anotherQuestion: Question;
 
 describe('ListQuestionCommentsUseCase', () => {
   beforeEach(async () => {
-    inMemoryQuestionsRepository = new InMemoryQuestionsRepository();
+    inMemoryQuestionAttachmentsRepository =
+      new InMemoryQuestionAttachementsRepository();
+    inMemoryQuestionsRepository = new InMemoryQuestionsRepository(
+      inMemoryQuestionAttachmentsRepository,
+    );
     inMemoryQuestionCommentsRepository =
       new InMemoryQuestionCommentsRepository();
     sut = new ListQuestionCommentsUseCase(inMemoryQuestionCommentsRepository);
