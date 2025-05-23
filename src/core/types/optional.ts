@@ -14,4 +14,8 @@
  * ```
  */
 
-export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+export type Optional<DataType, Key extends keyof DataType> = Omit<
+  DataType,
+  Key
+> &
+  Partial<Pick<DataType, Key>>;

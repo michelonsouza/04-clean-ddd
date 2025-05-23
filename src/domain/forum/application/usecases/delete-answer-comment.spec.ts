@@ -1,5 +1,7 @@
 import { fakerPT_BR as faker } from '@faker-js/faker';
 
+import { NotAllowedError } from '@/core/errors/not-allowed-error';
+import { ResourceNotFoundError } from '@/core/errors/resource-not-found';
 import { makeAnswer } from '__tests__/factories/make-answer';
 import { makeAnswerComment } from '__tests__/factories/make-answer-comment';
 import { InMemoryAnswerAttachementsRepository } from '__tests__/repositories/in-memory-answer-attachments-repository';
@@ -7,8 +9,6 @@ import { InMemoryAnswerCommentsRepository } from '__tests__/repositories/in-memo
 import { InMemoryAnswersRepository } from '__tests__/repositories/in-memory-answers-repository';
 
 import { DeleteAnswerCommentUseCase } from './delete-answer-comment';
-import { NotAllowedError } from './errors/not-allowed-error';
-import { ResourceNotFoundError } from './errors/resource-not-found';
 
 let inMemoryAnswerCommentsRepository: InMemoryAnswerCommentsRepository;
 let inMemoryAnswersRepository: InMemoryAnswersRepository;

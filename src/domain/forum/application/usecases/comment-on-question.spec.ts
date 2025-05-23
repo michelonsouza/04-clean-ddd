@@ -1,3 +1,4 @@
+import { ResourceNotFoundError } from '@/core/errors/resource-not-found';
 import { makeQuestion } from '__tests__/factories/make-question';
 import { makeQuestionComment } from '__tests__/factories/make-question-comment';
 import { InMemoryQuestionAttachementsRepository } from '__tests__/repositories/in-memory-question-attachments-repository';
@@ -5,7 +6,6 @@ import { InMemoryQuestionCommentsRepository } from '__tests__/repositories/in-me
 import { InMemoryQuestionsRepository } from '__tests__/repositories/in-memory-questions-repository';
 
 import { CommentOnQuestionUseCase } from './comment-on-question';
-import { ResourceNotFoundError } from './errors/resource-not-found';
 
 let inMemoryQuestionCommentsRepository: InMemoryQuestionCommentsRepository;
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;

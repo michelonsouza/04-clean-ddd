@@ -1,14 +1,14 @@
 import { fakerPT_BR as faker } from '@faker-js/faker';
 
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { NotAllowedError } from '@/core/errors/not-allowed-error';
+import { ResourceNotFoundError } from '@/core/errors/resource-not-found';
 import { makeQuestion } from '__tests__/factories/make-question';
 import { makeQuestionAttachment } from '__tests__/factories/make-question-attachment';
 import { InMemoryQuestionAttachementsRepository } from '__tests__/repositories/in-memory-question-attachments-repository';
 import { InMemoryQuestionsRepository } from '__tests__/repositories/in-memory-questions-repository';
 
 import { EditQuestionUseCase } from './edit-question';
-import { NotAllowedError } from './errors/not-allowed-error';
-import { ResourceNotFoundError } from './errors/resource-not-found';
 import { QuestionAttachmentList } from '../../enterprise/entities/question-attachment-list';
 
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;

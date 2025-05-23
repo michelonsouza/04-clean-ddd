@@ -1,10 +1,10 @@
 import { fakerPT_BR as faker } from '@faker-js/faker';
 
+import { ResourceNotFoundError } from '@/core/errors/resource-not-found';
 import { makeQuestion } from '__tests__/factories/make-question';
 import { InMemoryQuestionAttachementsRepository } from '__tests__/repositories/in-memory-question-attachments-repository';
 import { InMemoryQuestionsRepository } from '__tests__/repositories/in-memory-questions-repository';
 
-import { ResourceNotFoundError } from './errors/resource-not-found';
 import { GetQuestionBySlugUseCase } from './get-question-by-slug';
 
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
