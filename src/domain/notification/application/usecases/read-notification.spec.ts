@@ -30,6 +30,15 @@ describe('ReadNotificationUseCase', () => {
     expect(inMemoryNotificationsRepository.items[0].readAt).toBeInstanceOf(
       Date,
     );
+    expect(inMemoryNotificationsRepository.items[0].createdAt).toBeInstanceOf(
+      Date,
+    );
+    expect(inMemoryNotificationsRepository.items[0].title).toEqual(
+      notification.title,
+    );
+    expect(inMemoryNotificationsRepository.items[0].content).toEqual(
+      notification.content,
+    );
   });
 
   it('should not be able to read a notification from another recipiennt', async () => {

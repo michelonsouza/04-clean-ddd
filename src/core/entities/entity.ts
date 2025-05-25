@@ -16,10 +16,6 @@ export abstract class Entity<ParamsType = any> {
   }
 
   public equals(entity: Entity): boolean {
-    if (this === entity) {
-      return true;
-    }
-
     return this.#id.equals(entity.id);
   }
 }

@@ -6,6 +6,7 @@ import { Optional } from '@/core/types/optional';
 
 import { QuestionAttachmentList } from './question-attachment-list';
 import { Slug } from './value-objects/slug';
+import { QuestionBestAnswerChosenEvent } from '../events/question-best-answer-chosen-event';
 
 export interface QuestionConstructorParams {
   authorId: UniqueEntityID;
@@ -64,6 +65,19 @@ export class Question extends AggregateRoot<QuestionConstructorParams> {
   }
 
   set bestAnswerId(bestAnswerId: UniqueEntityID | undefined) {
+    if (bestAnswerId === undefined) {
+      return;
+    }
+
+    if (
+      this.params.bestAnswerId === undefined ||
+      !this.params.bestAnswerId.equals(bestAnswerId)
+    ) {
+      this.addDomainEvent(
+        new QuestionBestAnswerChosenEvent(this, bestAnswerId),
+      );
+    }
+
     this.params.bestAnswerId = bestAnswerId;
     this.#touch();
   }
