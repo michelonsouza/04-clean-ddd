@@ -4,13 +4,13 @@ import { Notification } from '@/domain/notification/enterprise/entities/notifica
 
 import { NotificationsRepository } from '../repositories/notifications-repository';
 
-interface SendNotificationUseCaseParams {
+export interface SendNotificationUseCaseParams {
   recipientId: string;
   title: string;
   content: string;
 }
 
-type SendNotificationUseCaseResponse = Either<
+export type SendNotificationUseCaseResponse = Either<
   null,
   {
     data: Notification;

@@ -6,12 +6,20 @@ export abstract class Entity<ParamsType = any> {
 
   protected params: ParamsType;
 
+  protected constructor(params: ParamsType, id?: UniqueEntityID) {
+    this.params = params;
+    this.#id = id ?? new UniqueEntityID();
+  }
+
   get id(): UniqueEntityID {
     return this.#id;
   }
 
-  protected constructor(params: ParamsType, id?: UniqueEntityID) {
-    this.params = params;
-    this.#id = id ?? new UniqueEntityID();
+  public equals(entity: Entity): boolean {
+    if (this === entity) {
+      return true;
+    }
+
+    return this.#id.equals(entity.id);
   }
 }
